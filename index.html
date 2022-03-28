@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>享迅科技</title>
+    <link rel="stylesheet" href="./css/base.css">
+    <link rel="stylesheet" href="./css/index.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+    <link rel="stylesheet" href="https://unpkg.com/animate.css@3.5.2/animate.min.css">
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <van-loading size="48px" vertical v-if="loading"> 加载中...</van-loading>
+
+        <div class="dtl_box" v-if="!loading">
+
+
+            <div class="banner">
+                <van-swipe @change="onChange">
+                    <van-swipe-item v-for="(image, index) in images" :key="index">
+                        <img :src="image" />
+                    </van-swipe-item>
+                    <template #indicator>
+                        <div class="custom-indicator">{{ current + 1 }}/{{images.length}}</div>
+                    </template>
+                </van-swipe>
+            </div>
+
+            <div class="collageInformation">
+                <div class="price-mes">
+                    <p class="price-con"><span class="price-symbol priceT">{{setPrice(goodsData.price)}}</span><span
+                            class="countTip">{{count}}人团</span></p>
+                    <p class="sign-mes"><span>单买价￥{{setPrice(goodsData.marketingPrice)}}</span> <span>已售
+                            {{goodsData.salesVolume}}件</span></p>
+                </div>
+                <div class="collage-time">
+                    <div class="inTime" v-if="inTime">
+                        <p class="STime">距拼团结束还剩:</p>
+                        <div class="timeDel">
+                            <div class="day"> <span>{{day}}</span></div>
+                            <div class="dayTip">天</div>
+                            <div class="hour"><span>{{hour}}</span>:</div>
+                            <div class="month"><span>{{month}}</span>:</div>
+                            <div class="second"><span>{{second}}</span></div>
+                        </div>
+                    </div>
+                    <div class="outTime" v-if="outTime">
+                        <p>拼团已结束</p>
+                    </div>
+                    <div class="noTime" v-if="noTime">
+                        <p>拼团未结束</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="goodsNames">
+                {{goodsData.name}}
+            </div>
+
+            <div class="rateTop " :class="[goodsData.specType?'':'nospecType']">
+                <div class="title">{{topName}}</div>
+                <div class="icon_left"><img src="./images/right.png" alt=""></div>
+            </div>
+            <div class="skuMes" v-if="goodsData.specType==1">
+                <div class="skuNameSelect">已选规格:{{showSku(skuName)}}</div>
+            </div>
+            <div class="rateTop" style="margin-top:0">
+                <div class="title">邮费 <span style="color: #ff5f09;">{{setPostage(goodsData.postage)}}</span></div>
+            </div>
+            <div class="CollageMen" v-if="colllist">
+                <p class="Ctip"><b>这些人正在拼</b></p>
+                <div class="container">
+                    <div class="row" v-for="(item,index) in colllist" :key="index">
+                        <div class="img-con">
+                            <div class="auth-img" v-for="(v,i) in item.item">
+                                <div>
+                                    <img :src="v.img" alt="" :class="v.isOwen?'':'isOwen'">
+                                </div>
+                                <div class="tzbox" v-if="v.isOwen">团长</div>
+
+                            </div>
+                        </div>
+                        <div class="collIn">
+                            <p>还差{{item.count}}人成团</p>
+                            <van-count-down :time="item.time" format="DD 天 HH 时 mm 分 ss 秒" />
+                        </div>
+                        <div class="goBuy">
+                            <div class="btn" @click="openSkuBox('group',item.id)">
+                                去参团
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="detailbox">
+                <div class="goodtitle">
+                    <span class="line"></span>
+                    <span class="txt">商品详情</span>
+                    <span class="line"></span>
+                </div>
+                <div class="gooddetail" v-html="html_decode(goodDetailTxt)">
+                </div>
+            </div>
+            <div class="empty">
+            </div>
+            <div class="action_Area">
+                <div class="center_box">
+                    <div class="iconGrup">
+                        <div class="serviceIcon">
+                            <img src="./images/server.png" alt="">
+                            <div>客服
+                            </div>
+                        </div>
+                        <div class="cartIcon">
+                            <img src="./images/cart.png" alt="" @click="goCart">
+                            <div>购物车
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="actionBtn">
+                        <div class="signBuy" @click="openSkuBox('sign')">
+                            <span>￥{{setPrice(goodsData.marketingPrice)}}</span>
+                            <p>单独购买</p>
+                        </div>
+                        <div class="groupBuy" :class="[outTime||noTime?'disable':'']" @click="openSkuBox('group')">
+                            <span>￥{{setPrice(goodsData.price)}}</span>
+                            <p>立即开团</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <van-popup v-model:show="skuPop" closeable round position="bottom" :style="{ maxHeight: '1200px' }">
+                <div class="popTitle">
+                    <p>选择商品</p>
+                    <div class="close_img"><img src="./images/close.png" alt="" @click="closeSkuPop()"></div>
+                </div>
+                <div class="popTitle_empty">
+
+                </div>
+                <div class="currentGoods">
+                    <div class="goods_container">
+                        <div class="goods_img">
+                            <img :src="goodsData.pic" alt="">
+                        </div>
+                        <div class="goods_info">
+                            <p class="two-text">{{goodsData.name}}</p>
+                            <p class="price-symbolMidd" style="color: #e35666;margin: 20px 0;">
+                                {{setPrice(goodsData.price)}}</p>
+                            <p class="num_stock">
+                                <span>数量 ：</span>
+                                <van-stepper v-model="value" integer min="1" :max="goodsData.stock" />
+
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="goods_info_empty">
+
+                </div>
+                <div v-for="(item,index) in tree" :key="index" class="sku_box" v-if="goodsData.specType==1">
+                    <p class="skuName">{{item.k}}</p>
+                    <div class="sku_box">
+                        <van-button @click="setValue(index,i,s.id)" :class="[s.isSelect?'isSelect':'']"
+                            v-for="(s,i) in item.v" :key="i" :disabled="s.disabled" type="default" size="small">
+                            {{s.name}}{{s.id}}
+                        </van-button>
+                    </div>
+                </div>
+                <div class="empty">
+
+                </div>
+                <div class="sureCom" v-if="skuPop">
+                    <div class="sureBtn" @click="goPay">确定</div>
+                </div>
+            </van-popup>
+        </div>
+    </div>
+</body>
+<script src="./libs/vue.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@next"></script> -->
+<script src="./libs/axios.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vant@next/lib/vant.min.js"></script>
+<script src="//res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+<script src="./libs/jquery.min.js"></script>
+<script>
+    const appHtml = {
+        data() {
+            return {
+                images: [],
+                current: 0,
+                count: 3,
+                topName: '【新品哈哈哈哈哈哈哈】第1名',
+                colllist: [{
+                        time: 30 * 60 * 60 * 1000,
+                        count: 2,
+                        item: [{
+                                img: "https://std.17int.cn/ecfile/goods/1634709056665-04ca645d613144b7b7a0f53029b7f22f.png",
+                                isOwen: true,
+                                name: '拼他妈团'
+
+                            },
+                            {
+                                img: "https://std.17int.cn/ecfile/goods/1634709056665-04ca645d613144b7b7a0f53029b7f22f.png",
+                            },
+                        ]
+                    },
+                    {
+                        time: 30 * 60 * 60 * 1000,
+                        count: 2,
+                        item: [{
+                                img: "https://std.17int.cn/ecfile/goods/1634709056665-04ca645d613144b7b7a0f53029b7f22f.png",
+
+                                isOwen: true,
+                                name: '拼他妈团'
+                            },
+                            {
+                                img: "https://std.17int.cn/ecfile/goods/1634709056665-04ca645d613144b7b7a0f53029b7f22f.png",
+                            },
+                        ]
+                    },
+                    {
+                        time: 30 * 60 * 60 * 1000,
+                        count: 2,
+                        item: [{
+                                img: "https://std.17int.cn/ecfile/goods/1634709056665-04ca645d613144b7b7a0f53029b7f22f.png",
+                                isOwen: true,
+                                name: '拼他妈团'
+
+                            },
+                            {
+                                img: "https://std.17int.cn/ecfile/goods/1634709056665-04ca645d613144b7b7a0f53029b7f22f.png",
+                            },
+                        ]
+                    },
+                ],
+                day: "",
+                hour: "",
+                month: "",
+                second: "",
+                timer: "",
+                inTime: "",
+                noTime: "",
+                outTime: "",
+                skuPop: false,
+                tree: "",
+                list: "",
+                defaultSku: "",
+                transList: {},
+                selectId: [],
+                rowListIds: [],
+                skuName: [],
+                goodDetailTxt: '<p><strong><span style="color: #ff6600;"><span style="color: #ff0000;">套餐15000元含有10万条酷信。</span><br /></span></strong><strong><span style="color: #ff6600;"><br /></span></strong></p>↵<p>解决方案：</p>↵<p>酷信由短信签名+文本内容+内容短链接+视频(或图片)等元素组成，实现的不仅仅是满足用户通信。娱乐及信息获取的一般需求，而是一种全新的沟通体验、时尚湖流和足以改变传统审美方式的网络及移动文化。<br /><br />活动详情：<br />短信适用于节日促销、新品上市、客户关怀等会员活动类短信（不包含金融、教育、游戏、房地产等）。<br /><br /></p>↵<p>部分合作伙伴:</p>↵<p><img class="wscnph" src="https://xxmallbk01.oss-cn-shenzhen.aliyuncs.com/b20d5d03-e592-4641-9b70-e0e0ca3eddfd.jpg" /></p>',
+                // httpUrl: "https://shop.hnlink.net/mobile-api/goods/110",
+                httpUrl: 'https://shop.hnlink.net/glasses-wx-api/goods/173',
+                goodsData: "",
+                loading: true,
+                id: ""
+            }
+
+        },
+        computed: {
+            showSku() {
+                return function (sku) {
+                    // s.sku.codeName=s.sku.codeName.replace(/,/g,"/")
+                    return sku.join(",").replace(/,/g, "/")
+                }
+            },
+            setPrice() {
+                return function (price) {
+                    return price / 100
+                }
+            },
+            setPostage() {
+                return function (postage) {
+                    if (postage) {
+                        return postage / 100 + "元"
+                    } else {
+                        return "包邮"
+                    }
+                }
+            }
+        },
+        created() {
+            this.getDoogsDtl()
+
+        },
+        methods: {
+            //获取点击值
+            setValue(index, i, id) {
+                var list = JSON.parse(JSON.stringify(this.rowListIds))
+                list.splice(index, 1)
+                this.tree[index].v.forEach(item => {
+                    item.isSelect = false
+                })
+                this.tree[index].v[i].isSelect = true
+                this.selectId[index] = id
+                console.log("当前点击", this.selectId)
+                var visbList = []
+                this.list.forEach(item => {
+                    if (item.code.indexOf(id.toString()) > -1) {
+                        visbList.push(...item.code)
+                    }
+                })
+                console.log("llllllll", visbList)
+                this.getDisable([...new Set(visbList)], list, index)
+                this.skuName = []
+                this.selectId.forEach(v => {
+                    this.tree.forEach((item, count) => {
+                        var num = item.v.findIndex(n => n.id == v)
+                        if (num > -1) {
+                            this.skuName.push(this.tree[count].v[num].name)
+
+                        }
+
+                    })
+                })
+                if (this.clearEmptyEle(this.selectId).length == this.tree.length) {
+                    console.log(this.selectId)
+                    if (this.transList[this.selectId.join(",")]) {
+                        this.goodsData.price = this.transList[this.selectId.join(",")].price;
+                        this.goodsData.stock = this.transList[this.selectId.join(",")].stock_num;
+                        this.goodsData.id = this.transList[this.selectId.join(",")].id;
+                        // this.setDefBtn(this.transList[this.selectId.join(",")], true)
+
+                    }
+                }
+            },
+            // 获取禁止点击id
+            getDisable(listIds, rowIds, index) {
+                console.log(listIds)
+                var visblistId = []
+                rowIds.forEach((item, count) => {
+                    listIds.forEach((v, i) => {
+                        if (i != index) {
+                            var num = item.indexOf(Number(v))
+                            if (num > -1) {
+                                visblistId.push(v)
+                            }
+                        }
+                    })
+                })
+                console.log('这是可选点击的id', visblistId)
+                this.setDisable([...new Set(visblistId)], index)
+            },
+            //设置禁止点击id
+            setDisable(list, index) {
+                this.tree.forEach((b, i) => {
+                    if (i != index) {
+                        b.v.forEach(j => {
+                            j.disabled = true
+                        })
+                    }
+                })
+                list.forEach(v => {
+                    this.tree.forEach((item, count) => {
+                        var num = item.v.findIndex(n => n.id == v)
+                        if (num > -1) {
+                            this.tree[count].v[num].disabled = false
+                            console.log(count, num)
+                        }
+
+                    })
+                })
+
+                console.log(this.tree)
+            },
+            //判断是否全部可选
+            checkVisble() {
+                //所有规格id
+                var skuIds = []
+                //可选规格id
+                var hasSkuIds = []
+                this.tree.forEach(item => {
+                    item.v.forEach(s => {
+                        skuIds.push(s.id)
+                    })
+                })
+                this.list.forEach(item => {
+                    hasSkuIds.push(...item.code)
+                })
+                var diffenceList = this.diffence(this.transFromStr(skuIds), [...new Set(hasSkuIds)])
+                this.tree.forEach(item => {
+                    item.v.forEach(s => {
+                        s.disabled = false
+                    })
+                })
+                console.log(diffenceList)
+                for (var i = 0; i < diffenceList.length; i++) {
+                    this.tree.forEach((item, index) => {
+                        var sindex = item.v.findIndex(s => s.id == diffenceList[i])
+                        if (sindex > -1) {
+                            this.tree[index].v[sindex].disabled = true
+                        } else {}
+                    })
+                }
+
+            },
+            //用于求所有规格id与可选规格id之间得差集
+            diffence(arr1, arr2) {
+                let set1 = new Set(arr1)
+                let set2 = new Set(arr2)
+                let subset = []
+                for (let item of set1) {
+                    if (!set2.has(item)) {
+                        subset.push(item)
+                    }
+                }
+                return subset
+            },
+            //数组元素转字符串
+            transFromStr(arr) {
+                return arr.map(v => v.toString())
+            },
+            //设默认规格
+            setDefBtn(list, isArr) {
+                console.log(list)
+                var that = this
+                var data = list.code
+                if (!isArr) {
+                    data = list.code.split(",")
+                }
+                this.skuName = []
+                data.forEach(v => {
+                    this.tree.forEach((item, count) => {
+                        var num = item.v.findIndex(n => n.id == v)
+                        if (num > -1) {
+                            this.tree[count].v[num].isSelect = true
+                            this.skuName.push(this.tree[count].v[num].name)
+
+                        }
+
+                    })
+                })
+                var showData = this.list.filter(v => v.id == list.id)[0]
+                this.goodsData.price = showData.price
+                this.goodsData.stock_num = showData.stock_num
+                this.selectId = data
+            },
+            openSkuBox(str) {
+                if (str == 'group' && (this.outTime || this.noTime)) {
+                    return
+                }
+                this.skuPop = true
+            },
+            closeSkuPop() {
+                this.skuPop = false
+            },
+            onChange(index) {
+                this.current = index;
+            },
+            //设置倒计时
+            setTime(EndTime) {
+                var EndTime = EndTime
+                var NowTime = new Date();
+                var that = this
+                var t = EndTime - (NowTime.getTime() / 1000).toFixed(0);
+                if (t < 1) {
+                    clearInterval(that.timer)
+                    that.outTime = true
+                    that.inTime = that.noTime = false
+                    return
+                }
+                that.inTime = true
+                that.outTime = that.noTime = false
+                console.log("in时")
+                var d = Math.floor(t / 60 / 60 / 24);
+                var h = Math.floor(t / 60 / 60 % 24);
+                var m = Math.floor(t / 60 % 60);
+                var s = Math.floor(t % 60);
+                if (parseInt(d) < 10) {
+                    d = "0" + d;
+                }
+                if (parseInt(h) < 10) {
+                    h = "0" + h;
+                }
+                if (parseInt(m) < 10) {
+                    m = "0" + m;
+                }
+                if (parseInt(s) < 10) {
+                    s = "0" + s;
+                }
+                this.day = d
+                this.hour = h
+                this.month = m
+                this.second = s
+
+            },
+            //去空元素
+            clearEmptyEle(arr) {
+                var result = arr.filter(function (n) {
+                    return n
+                })
+                return result
+            },
+            getDoogsDtl() {
+                var that = this
+                // that.id=that.getQueryString('id')
+                // console.log(that.id)
+                axios.get(that.httpUrl + that.id).then(function (res) {
+                    var {
+                        data
+                    } = res.data
+                    that.goodsData = data.goods
+
+                    that.images = data.goods.gallery.split(',')
+                    var NowTime = new Date();
+                    var EndTime = ((NowTime.getTime() + 5000) / 1000).toFixed(0)
+                    that.setTime(EndTime)
+                    if (data.goods.specType == 0) {
+                        return
+                    }
+                    that.tree = data.sku.tree
+                    that.goodDetailTxt = data.goods.detail
+                    console.log(that.goodsData, that.list, that.tree)
+                    that.list = data.sku.list.sort((a, b) => a.price - b.price)
+                    that.defaultSku = that.list[0]
+                    that.setDefBtn(that.list[0])
+                    that.list.forEach((item, index) => {
+                        item.code = item.code.split(",")
+                        that.transList[that.list[index].code] = that.list[index];
+                    })
+                    that.tree.forEach((item, index) => {
+                        that.rowListIds[index] = item.v.map(s => s.id)
+                    })
+                    that.checkVisble()
+                    that.loading = false
+                }).catch(err => {
+                    console.log(err)
+                })
+            },
+            html_decode(str) {
+                var s = "";
+                //console.log(str)
+                if (str.length == 0) return "";
+                s = str.replace(/&amp;/g, "&");
+                s = s.replace(/&lt;/g, "<");
+                s = s.replace(/&gt;/g, ">");
+                s = s.replace(/&nbsp;/g, " ");
+                s = s.replace(/&#39;/g, "\'");
+                s = s.replace(/&quot;/g, "\"");
+                s = s.replace(/<br \/>/g, "\n");
+                s = s.replace(/(↵)/g, "<br>");
+                return s;
+            },
+            goCart() {
+                window.wx.miniProgram.switchTab({
+                    url: '/pages/cart/index'
+                })
+            },
+            goPay() {
+                window.wx.miniProgram.navigateTo({
+                    url: '/pages/paymentOrder/index'
+                })
+            },
+            //获取url信息
+            getQueryString(params) {
+                var reg = new RegExp("(^|&)" + params + "=([^&]*)(&|$)", "i"); //解析url地址
+                var url = decodeURI(decodeURI(window.location.search))
+                var r = window.location.search.substr(1).match(reg);
+                if (r != null) {
+                    return unescape(r[2]);
+                }
+                return null;
+            }
+        },
+        mounted() {
+            var that = this
+            var NowTime = new Date();
+            var EndTime = ((NowTime.getTime() + 5000) / 1000).toFixed(0)
+            that.timer = setInterval(function () {
+                that.setTime(EndTime)
+            }, 1000)
+
+        },
+
+    }
+
+
+    // 创建
+    const app = Vue.createApp(appHtml)
+    // 引入vant组件
+    // app.use(vant);
+    app.use(vant.Lazyload);
+    app.use(vant.Stepper);
+    app.use(vant.Button);
+    app.use(vant.Grid);
+    app.use(vant.Icon);
+    app.use(vant.GridItem);
+    app.use(vant.Empty);
+    app.use(vant.Swipe);
+    app.use(vant.SwipeItem);
+    app.use(vant.CountDown);
+    app.use(vant.Cell);
+    app.use(vant.Loading);
+    app.use(vant.Popup);
+    app.mount('#app');
+</script>
+<style>
+
+</style>
+
+</html>
