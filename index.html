@@ -321,7 +321,7 @@
                     })
                 })
                 if (this.clearEmptyEle(this.selectId).length == this.tree.length) {
-                    console.log(this.selectId)
+                    console.log(this.transList[this.selectId.join(",")])
                     if (this.transList[this.selectId.join(",")]) {
                         this.goodsData.price = this.transList[this.selectId.join(",")].price;
                         this.goodsData.stock = this.transList[this.selectId.join(",")].stock_num;
