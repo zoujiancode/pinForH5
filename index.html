@@ -563,11 +563,11 @@
             },
             goPay() {
                 if (this.clearEmptyEle(this.selectId).length != this.tree.length) {
-                    // this.$toast.fail({
-                    //     duration: 800,
-                    //     forbidClick: true,
-                    //     message: '请选择规格',
-                    // });
+                    this.$toast.fail({
+                        duration: 800,
+                        forbidClick: true,
+                        message: '请选择规格',
+                    });
                     return
                 }
                 window.wx.miniProgram.navigateTo({
