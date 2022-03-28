@@ -12,7 +12,7 @@
 
 <body>
     <div id="app" v-cloak>
-        <van-loading size="48px" vertical v-if="loading"> 加载中...</van-loading>
+        <van-loading size="120px" vertical v-if="loading"> 加载中...</van-loading>
 
         <div class="dtl_box" v-if="!loading">
 
@@ -298,8 +298,15 @@
                 this.tree[index].v.forEach(item => {
                     item.isSelect = false
                 })
-                this.tree[index].v[i].isSelect = true
-                this.selectId[index] = id
+                if (this.selectId[index]) {
+                    this.tree[index].v[i].isSelect = false
+                    this.selectId[index] = ""
+                } else {
+                    this.tree[index].v[i].isSelect = true
+                    this.selectId[index] = id
+                }
+                // this.tree[index].v[i].isSelect = true
+                // this.selectId[index] = id
                 console.log("当前点击", this.selectId)
                 var visbList = []
                 this.list.forEach(item => {
@@ -500,6 +507,7 @@
             },
             getDoogsDtl() {
                 var that = this
+                this.loading=true
                 // that.id=that.getQueryString('id')
                 // console.log(that.id)
                 axios.get(that.httpUrl + that.id).then(function (res) {
@@ -554,6 +562,14 @@
                 })
             },
             goPay() {
+                if (this.clearEmptyEle(this.selectId).length != this.tree.length) {
+                    // this.$toast.fail({
+                    //     duration: 800,
+                    //     forbidClick: true,
+                    //     message: '请选择规格',
+                    // });
+                    return
+                }
                 window.wx.miniProgram.navigateTo({
                     url: '/pages/paymentOrder/index'
                 })
@@ -571,6 +587,7 @@
         },
         mounted() {
             var that = this
+
             var NowTime = new Date();
             var EndTime = ((NowTime.getTime() + 5000) / 1000).toFixed(0)
             that.timer = setInterval(function () {
@@ -585,7 +602,7 @@
     // 创建
     const app = Vue.createApp(appHtml)
     // 引入vant组件
-    // app.use(vant);
+    app.use(vant);
     app.use(vant.Lazyload);
     app.use(vant.Stepper);
     app.use(vant.Button);
@@ -597,6 +614,7 @@
     app.use(vant.SwipeItem);
     app.use(vant.CountDown);
     app.use(vant.Cell);
+    app.use(vant.Toast);
     app.use(vant.Loading);
     app.use(vant.Popup);
     app.mount('#app');
