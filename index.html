@@ -298,15 +298,17 @@
                 this.tree[index].v.forEach(item => {
                     item.isSelect = false
                 })
-                if (this.selectId[index]) {
-                    this.tree[index].v[i].isSelect = false
-                    this.selectId[index] = ""
-                } else {
-                    this.tree[index].v[i].isSelect = true
-                    this.selectId[index] = id
-                }
-                // this.tree[index].v[i].isSelect = true
-                // this.selectId[index] = id
+                // if (this.selectId[index]) {
+                //     console.log("一点过")
+                //     this.tree[index].v[i].isSelect = false
+                //     this.selectId[index] = ""
+                // } else {
+                //     console.log("微电机")
+                //     this.tree[index].v[i].isSelect = true
+                //     this.selectId[index] = id
+                // }
+                this.tree[index].v[i].isSelect = true
+                this.selectId[index] = id
                 console.log("当前点击", this.selectId)
                 var visbList = []
                 this.list.forEach(item => {
