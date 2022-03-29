@@ -396,6 +396,7 @@ img {
     position: fixed;
     bottom: 0;
     left: 0;
+    background-color: #fff;
 }
 
 .sureBtn {
@@ -406,7 +407,7 @@ img {
     height: 100px;
     line-height: 100px;
     color: #fff;
-    background-color: #fe570d;
+    background:linear-gradient(to right, #fa6e21, #f96821);
     font-size: 36px;
 
 }
@@ -423,7 +424,7 @@ img {
 }
 
 .van-button--small {
-    height: 75px !important;
+    height: 65px !important;
     padding: 0 24px !important;
     font-size: 28px !important;
     margin: 10px !important;
@@ -465,7 +466,9 @@ img {
     font-size: 42px;
     width: calc(100% - 350px);
 }
-
+.goods_info .stockT{
+    font-size: 32px;
+}
 .two-text {
     width: 100%;
     display: -webkit-box;
@@ -477,39 +480,45 @@ img {
 }
 
 .num_stock {
-    display: flex;
-    height: 50px;
-    line-height: 50px;
-
+    /* height: 50px;
+    line-height: 50px; */
+    padding: 0 45px;
+    font-size: 32px;
 }
 
-.num_stock span {
-    font-size: 28px;
-    color: #9c9b9c;
+.num_stock p {
+    margin: 20px 0;
+    margin-bottom: 35px;
 }
 
 .van-stepper__input {
-    width: 50px !important;
-    height: 50px !important;
-    border: 2px solid #e6e6e6 !important;
+    width: 60px !important;
+    height: 60px !important;
+    border: 1px solid #e6e6e6 !important;
     font-size: 26px !important;
-    background-color: #fff !important;
+    background-color: #f2f3f5 !important;
+    color: black !important;
+    margin: 0 4px !important;
 }
 
 .van-stepper__minus {
-    width: 50px !important;
-    height: 50px !important;
-    border: 2px solid #e6e6e6 !important;
+    width: 60px !important;
+    height: 60px !important;
+    border: 1px solid #e6e6e6 !important;
     font-size: 28px !important;
-    border-radius: 5px 0 0 5px !important;
+    border-radius: 8px 0 0 8px !important;
+    background-color: #f2f3f5 !important;
+    color: black !important;
 }
 
 .van-stepper__plus {
-    width: 50px !important;
-    height: 50px !important;
-    border: 2px solid #e6e6e6 !important;
+    width: 60px !important;
+    height: 60px !important;
+    border: 1px solid #e6e6e6 !important;
     font-size: 28px !important;
-    border-radius: 0 5px 5px 0 !important;
+    border-radius: 0 8px 8px 0 !important;
+    background-color: #f2f3f5 !important;
+    color: black !important;
 }
 
 .detailbox {

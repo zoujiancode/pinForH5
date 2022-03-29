@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>享迅科技</title>
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"> -->
     <link rel="stylesheet" href="./css/base.css">
     <link rel="stylesheet" href="./css/index.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
@@ -85,7 +86,19 @@
                         <div class="collIn">
                             <p>还差{{item.count}}人成团</p>
                             <van-count-down :time="item.time" format="DD 天 HH 时 mm 分 ss 秒" />
+                           
                         </div>
+                         <!-- <van-count-down :time="item.time" @change="finishTime(index)">
+                                <template #default="timeData">
+                                    <span class="block">{{ timeData.days }}</span>
+                                    <span class="colon">天</span>
+                                    <span class="block">{{ timeData.hours }}</span>
+                                    <span class="colon">:</span>
+                                    <span class="block">{{ timeData.minutes }}</span>
+                                    <span class="colon">:</span>
+                                    <span class="block">{{ timeData.seconds }}</span>
+                                </template>
+                            </van-count-down> -->
                         <div class="goBuy">
                             <div class="btn" @click="openSkuBox('group',item.id)">
                                 去参团
@@ -148,13 +161,11 @@
                             <img :src="goodsData.pic" alt="">
                         </div>
                         <div class="goods_info">
-                            <p class="two-text">{{goodsData.name}}</p>
-                            <p class="price-symbolMidd" style="color: #e35666;margin: 20px 0;">
+                            <p class="two-text"> <b>{{goodsData.name}}</b></p>
+                            <p class="price-symbolMidd" style="color: red;margin: 20px 0;font-weight: bolder;">
                                 {{setPrice(goodsData.price)}}</p>
-                            <p class="num_stock">
-                                <span>数量 ：</span>
-                                <van-stepper v-model="value" integer min="1" :max="goodsData.stock" />
-
+                            <p class="stockT">
+                                库存:{{goodsData.stock}}
                             </p>
                         </div>
                     </div>
@@ -164,13 +175,17 @@
 
                 </div>
                 <div v-for="(item,index) in tree" :key="index" class="sku_box" v-if="goodsData.specType==1">
-                    <p class="skuName">{{item.k}}</p>
+                    <p class="skuName"><b>{{item.k}}</b></p>
                     <div class="sku_box">
                         <van-button @click="setValue(index,i,s.id)" :class="[s.isSelect?'isSelect':'']"
                             v-for="(s,i) in item.v" :key="i" :disabled="s.disabled" type="default" size="small">
-                            {{s.name}}{{s.id}}
+                            {{s.name}}
                         </van-button>
                     </div>
+                </div>
+                <div class="num_stock">
+                    <p><b>数量:</b></p>
+                    <van-stepper v-model="value" integer min="1" :max="goodsData.stock" />
                 </div>
                 <div class="empty">
 
@@ -197,7 +212,7 @@
                 count: 3,
                 topName: '【新品哈哈哈哈哈哈哈】第1名',
                 colllist: [{
-                        time: 30 * 60 * 60 * 1000,
+                        time: 400 * 1000 ,
                         count: 2,
                         item: [{
                                 img: "https://std.17int.cn/ecfile/goods/1634709056665-04ca645d613144b7b7a0f53029b7f22f.png",
@@ -211,7 +226,7 @@
                         ]
                     },
                     {
-                        time: 30 * 60 * 60 * 1000,
+                        time: 50 * 1000 * 20,
                         count: 2,
                         item: [{
                                 img: "https://std.17int.cn/ecfile/goods/1634709056665-04ca645d613144b7b7a0f53029b7f22f.png",
@@ -225,13 +240,12 @@
                         ]
                     },
                     {
-                        time: 30 * 60 * 60 * 1000,
+                        time: 50 * 1000 * 30,
                         count: 2,
                         item: [{
                                 img: "https://std.17int.cn/ecfile/goods/1634709056665-04ca645d613144b7b7a0f53029b7f22f.png",
                                 isOwen: true,
                                 name: '拼他妈团'
-
                             },
                             {
                                 img: "https://std.17int.cn/ecfile/goods/1634709056665-04ca645d613144b7b7a0f53029b7f22f.png",
@@ -260,7 +274,9 @@
                 httpUrl: 'https://shop.hnlink.net/glasses-wx-api/goods/173',
                 goodsData: "",
                 loading: true,
-                id: ""
+                id: "",
+                maxPrice: "",
+                keepStock: ""
             }
 
         },
@@ -273,6 +289,9 @@
             },
             setPrice() {
                 return function (price) {
+                    if (typeof price == "string") {
+                        return price
+                    }
                     return price / 100
                 }
             },
@@ -295,20 +314,26 @@
             setValue(index, i, id) {
                 var list = JSON.parse(JSON.stringify(this.rowListIds))
                 list.splice(index, 1)
-                this.tree[index].v.forEach(item => {
-                    item.isSelect = false
-                })
-                // if (this.selectId[index]) {
-                //     console.log("一点过")
-                //     this.tree[index].v[i].isSelect = false
-                //     this.selectId[index] = ""
-                // } else {
-                //     console.log("微电机")
-                //     this.tree[index].v[i].isSelect = true
-                //     this.selectId[index] = id
-                // }
-                this.tree[index].v[i].isSelect = true
-                this.selectId[index] = id
+
+                if (this.tree[index].v[i].isFlag) {
+                    console.log("一点过")
+                    this.tree[index].v.forEach(item => {
+                        item.isSelect = false
+                        item.isFlag = false
+                    })
+                    this.selectId[index] = ""
+                } else {
+                    this.tree[index].v.forEach(item => {
+                        item.isSelect = false
+                        item.isFlag = false
+                    })
+                    console.log("微电机")
+                    this.tree[index].v[i].isSelect = true
+                    this.tree[index].v[i].isFlag = true
+                    this.selectId[index] = id
+                }
+                // this.tree[index].v[i].isSelect = true
+                // this.selectId[index] = id
                 console.log("当前点击", this.selectId)
                 var visbList = []
                 this.list.forEach(item => {
@@ -330,15 +355,13 @@
                     })
                 })
                 if (this.clearEmptyEle(this.selectId).length == this.tree.length) {
-                    console.log(this.transList[this.selectId.join(",")])
-                    if (this.transList[this.selectId.join(",")]) {
-                        this.goodsData.price = this.transList[this.selectId.join(",")].price;
-                        this.goodsData.stock = this.transList[this.selectId.join(",")].stock_num;
-                        this.goodsData.id = this.transList[this.selectId.join(",")].id;
-                        // this.setDefBtn(this.transList[this.selectId.join(",")], true)
-
-                    }
+                    this.goodsData.price = this.transList[this.selectId.join(",")].price;
+                    this.goodsData.stock = this.transList[this.selectId.join(",")].stock_num;
+                    this.goodsData.id = this.transList[this.selectId.join(",")].id;
+                    return
                 }
+                this.goodsData.price = this.defaultSku.price / 100 + "~" + this.maxPrice / 100
+                this.goodsData.stock = this.keepStock;
             },
             // 获取禁止点击id
             getDisable(listIds, rowIds, index) {
@@ -440,6 +463,7 @@
                         var num = item.v.findIndex(n => n.id == v)
                         if (num > -1) {
                             this.tree[count].v[num].isSelect = true
+                            this.tree[count].v[num].isFlag = true
                             this.skuName.push(this.tree[count].v[num].name)
 
                         }
@@ -448,7 +472,7 @@
                 })
                 var showData = this.list.filter(v => v.id == list.id)[0]
                 this.goodsData.price = showData.price
-                this.goodsData.stock_num = showData.stock_num
+                this.goodsData.stock = showData.stock_num
                 this.selectId = data
             },
             openSkuBox(str) {
@@ -509,7 +533,7 @@
             },
             getDoogsDtl() {
                 var that = this
-                this.loading=true
+                this.loading = true
                 // that.id=that.getQueryString('id')
                 // console.log(that.id)
                 axios.get(that.httpUrl + that.id).then(function (res) {
@@ -530,6 +554,9 @@
                     console.log(that.goodsData, that.list, that.tree)
                     that.list = data.sku.list.sort((a, b) => a.price - b.price)
                     that.defaultSku = that.list[0]
+                    that.maxPrice = that.list[that.list.length - 1].price
+                    that.keepStock = data.goods.stock
+                    console.log(that.keepStock)
                     that.setDefBtn(that.list[0])
                     that.list.forEach((item, index) => {
                         item.code = item.code.split(",")
@@ -543,6 +570,9 @@
                 }).catch(err => {
                     console.log(err)
                 })
+            },
+            finishTime(index) {
+                console.log(this.colllist[0].time)
             },
             html_decode(str) {
                 var s = "";
