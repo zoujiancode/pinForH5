@@ -27,14 +27,16 @@ img {
 }
 
 .collageInformation {
-    background-color: #f33812;
-    height: 180px;
+    /* background-color: #f33812; */
+    background: url('../images/bg.png') ;
+    background-size:100% 100%;
+    height: 150px;
     width: 100%;
     display: flex;
 }
 
 .price-mes {
-    width: 65%;
+    width: 70%;
 }
 
 .price-symbol::before {
@@ -57,7 +59,7 @@ img {
 .price-con {
     display: flex;
     align-items: center;
-    height: 110px;
+    height: 100px;
     padding: 0 20px;
 }
 
@@ -87,10 +89,10 @@ img {
 
 .collage-time {
     font-size: 28px;
-    width: 35%;
-    background-color: #ffeae9;
-    padding-left: 30px;
-    border-radius: 65px 0 0 65px;
+    width: 30%;
+    /* background-color: #ffeae9; */
+    /* padding-left: 30px; */
+    /* border-radius: 65px 0 0 65px; */
 }
 
 .timeDel {
@@ -129,8 +131,7 @@ img {
 .collage-time .STime {
     color: #f04d32;
     font-size: 32px;
-    margin-top: 40px;
-    margin-bottom: 20px;
+    margin: 20px 0;
 }
 
 .outTime {
@@ -317,7 +318,7 @@ img {
 }
 
 .action_Area {
-    height: 100px;
+    height: calc(100px + env(safe-area-inset-bottom));
     display: flex;
     position: fixed;
     bottom: 0;
@@ -343,7 +344,7 @@ img {
     color: #fff;
     border-radius: 50px;
     overflow: hidden;
-
+    height: 100px;
 }
 
 .action_Area .signBuy {
@@ -395,6 +396,7 @@ img {
     width: 100%;
     position: fixed;
     bottom: 0;
+    height:  calc(120px + env(safe-area-inset-bottom));
     left: 0;
     background-color: #fff;
 }
@@ -593,4 +595,7 @@ img {
 .van-toast__icon {
     font-size: 120px !important;
     margin-bottom: 10px !important;
+}
+.sku_empty{
+    height: calc(120px + env(safe-area-inset-bottom));;
 }

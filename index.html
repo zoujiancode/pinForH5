@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <title>享迅科技</title>
-    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"> -->
+    <!-- <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover"
+  /> -->
     <link rel="stylesheet" href="./css/base.css">
     <link rel="stylesheet" href="./css/index.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
@@ -147,7 +150,7 @@
                 </div>
 
             </div>
-            <van-popup v-model:show="skuPop" closeable round position="bottom" :style="{ maxHeight: '1200px' }">
+            <van-popup v-model:show="skuPop" closeable round position="bottom" :style="{ maxHeight: '1300px' }">
                 <div class="popTitle">
                     <p>选择商品</p>
                     <div class="close_img"><img src="./images/close.png" alt="" @click="closeSkuPop()"></div>
@@ -187,7 +190,7 @@
                     <p><b>数量:</b></p>
                     <van-stepper v-model="value" integer min="1" :max="goodsData.stock" />
                 </div>
-                <div class="empty">
+                <div class="sku_empty">
 
                 </div>
                 <div class="sureCom" v-if="skuPop">
@@ -197,6 +200,7 @@
         </div>
     </div>
 </body>
+
 <script src="./libs/vue.js"></script>
 <!-- <script src="https://cdn.jsdelivr.net/npm/vue@next"></script> -->
 <script src="./libs/axios.js"></script>
@@ -544,7 +548,7 @@
 
                     that.images = data.goods.gallery.split(',')
                     var NowTime = new Date();
-                    var EndTime = ((NowTime.getTime() + 5000) / 1000).toFixed(0)
+                    var EndTime = ((NowTime.getTime() + 500000) / 1000).toFixed(0)
                     that.setTime(EndTime)
                     if (data.goods.specType == 0) {
                         return
